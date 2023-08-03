@@ -53,7 +53,7 @@ class _MyHomePageState extends State<CompanyScreen> {
                      /* updatecompany();*/
                     }else{
                       addcompany();
-                    }
+                    }//ffg
 
                     clearText();
                   }
