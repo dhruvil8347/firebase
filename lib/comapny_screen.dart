@@ -10,10 +10,15 @@ class CompanyScreen extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<CompanyScreen> {
-  CollectionReference company =
+  final  CollectionReference  company =
       FirebaseFirestore.instance.collection('company');
+
   TextEditingController companyCtrl = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  String id = "";
+  String time = "";
+  /*DateTime createAt = DateTime.now();*/
+  
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +53,11 @@ class _MyHomePageState extends State<CompanyScreen> {
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   if (formkey.currentState!.validate()) {
-
-                    if(company.id.isNotEmpty){
-                     /* updatecompany();*/
+                    if(id.isNotEmpty){
+                      updatecompany(id);
                     }else{
                       addcompany();
                     }//ffgdd
-
                     clearText();
                   }
                 },
@@ -70,7 +73,7 @@ class _MyHomePageState extends State<CompanyScreen> {
             Expanded(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
-                    .collection('company')
+                    .collection('company').orderBy('createAt', descending: true)
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasData) {
@@ -100,8 +103,9 @@ class _MyHomePageState extends State<CompanyScreen> {
                                   children: [
                                     GestureDetector(
                                         onTap: () {
-                                          updatecompany(
-                                             document.id);
+                                          id = document.id;
+                                          /// store value in text controller
+                                          companyCtrl.text = document['company'];
                                         },
                                         child: const Icon(Icons.edit,
                                             color: Colors.white)),
@@ -142,7 +146,8 @@ class _MyHomePageState extends State<CompanyScreen> {
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.red),
-                                                        ))
+                                                        )
+                                                    )
                                                   ],
                                                 );
                                               },
@@ -172,6 +177,7 @@ class _MyHomePageState extends State<CompanyScreen> {
   Future<void> addcompany() {
     return company.add({
       "company": companyCtrl.text.trim(),
+      "createAt":DateTime.now(),
     });
   }
 
@@ -193,5 +199,6 @@ class _MyHomePageState extends State<CompanyScreen> {
 
   clearText() {
     companyCtrl.clear();
+    id = "";
   }
 }

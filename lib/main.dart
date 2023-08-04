@@ -1,5 +1,6 @@
 import 'package:firebase_project/category_screen.dart';
 import 'package:firebase_project/comapny_screen.dart';
+import 'package:firebase_project/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -45,14 +46,19 @@ class _ListappState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Container(
-              height: 200,
-              color: Colors.blue,
-              child: const Center(
-                  child: Text(
-                    "Product",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  )),
+            GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ProductScreen() ,));
+              },
+              child: Container(
+                height: 200,
+                color: Colors.blue,
+                child: const Center(
+                    child: Text(
+                      "Product",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    )),
+              ),
             ),
             const SizedBox(height: 30),
             GestureDetector(
