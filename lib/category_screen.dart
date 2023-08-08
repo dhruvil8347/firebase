@@ -14,6 +14,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       FirebaseFirestore.instance.collection("category");
   TextEditingController categoryCtrl = TextEditingController();
   List<String> name = [];
+  final formkey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,20 +26,34 @@ class _CategoryScreenState extends State<CategoryScreen> {
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
-            TextFormField(
-              controller: categoryCtrl,
-              decoration: InputDecoration(
-                  label: const Text("Category"),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10))),
+            Form(
+              key: formkey,
+              child: TextFormField(
+                validator: (value) {
+                  if(value == null || value.trim().isEmpty){
+                    return "Enter the the category";
+                  }
+                  return null;
+                },
+                controller: categoryCtrl,
+                decoration: InputDecoration(
+                    label: const Text("Category"),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10))),
+              ),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
+              onLongPress: (){
+                print('null');
+              },
                 onPressed: () {
+                  if(formkey.currentState!.validate()){
+                    FocusScope.of(context).unfocus();
+                    addCategory();
+                    categoryCtrl.clear();
+                  }
 
-                  FocusScope.of(context).unfocus();
-                  addCategory();
-                  categoryCtrl.clear();
                 },
                 style: ElevatedButton.styleFrom(
                     fixedSize: const Size(321, 50),
@@ -154,7 +169,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Future<void> addCategory() {
     return category.add({
-      "category": categoryCtrl.text,
+      "category": categoryCtrl.text.trim(),
       "createAt": DateTime.now()});
   }
 

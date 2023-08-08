@@ -17,6 +17,7 @@ class _MyHomePageState extends State<CompanyScreen> {
   final formkey = GlobalKey<FormState>();
   String id = "";
   String time = "";
+  int? companyValue ;
   /*DateTime createAt = DateTime.now();*/
   
 
@@ -50,6 +51,9 @@ class _MyHomePageState extends State<CompanyScreen> {
               height: 5,
             ),
             ElevatedButton(
+                onLongPress: (){
+                  print('null');
+                },
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   if (formkey.currentState!.validate()) {
@@ -75,6 +79,7 @@ class _MyHomePageState extends State<CompanyScreen> {
                 stream: FirebaseFirestore.instance
                     .collection('company').orderBy('createAt', descending: true)
                     .snapshots(),
+
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasData) {
                     return ListView(
@@ -145,7 +150,7 @@ class _MyHomePageState extends State<CompanyScreen> {
                                                           "Delete",
                                                           style: TextStyle(
                                                               color:
-                                                                  Colors.red),
+                                                              Colors.red),
                                                         )
                                                     )
                                                   ],
