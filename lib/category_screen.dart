@@ -150,7 +150,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         }).toList(),
                       );
                     }
-                    return const CircularProgressIndicator();
+                    return Center(child: const CircularProgressIndicator());
                   }),
             ),
             /*Expanded(

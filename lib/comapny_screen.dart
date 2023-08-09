@@ -168,8 +168,7 @@ class _MyHomePageState extends State<CompanyScreen> {
                       );
                     }).toList());
                   }
-                  return const SizedBox(
-                      height: 100, width: 100, child: Text(":-)"));
+                  return Center(child: CircularProgressIndicator());
                 },
               ),
             ),

@@ -40,6 +40,8 @@ dependencies:
   cloud_firestore: ^4.8.4
   firebase_core: ^2.15.0
   image_picker: ^1.0.1
+  permission_handler:
+  file_picker: ^5.3.3
 
 
 
