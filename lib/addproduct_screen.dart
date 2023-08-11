@@ -1,36 +1,25 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_project/common/apptextfiled.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'main.dart';
 import 'model/product_model.dart';
 
-
 class AddProduct extends StatefulWidget {
-  const AddProduct({Key? key,  this.productModel}) : super(key: key);
+  const AddProduct({Key? key, this.productModel}) : super(key: key);
   final ProductModel? productModel;
 
   @override
   State<AddProduct> createState() => _AddProductState();
 }
 
-
-
-/*List<String> companyList = [
-  "1",
-  "2",
-  "3",
-  "4",
-];*/
-
 class _AddProductState extends State<AddProduct> {
   CollectionReference product =
       FirebaseFirestore.instance.collection("product");
+
   final TextEditingController productController = TextEditingController();
   final TextEditingController driscripationController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
@@ -42,23 +31,24 @@ class _AddProductState extends State<AddProduct> {
   final int qtyLength = 2;
   String? comapanyValue;
   String? categoryValue;
-  List<File> selectedImage = [];
+  List<String> selectedImage = [];
   final picker = ImagePicker();
+  String imageURL = '';
 
   @override
   void initState() {
     super.initState();
-    if(widget.productModel!.id.isNotEmpty){
+    if (widget.productModel != null) {
       productController.text = widget.productModel!.productName;
+      driscripationController.text = widget.productModel!.description;
       priceController.text = widget.productModel!.price.toString();
       qtyController.text = widget.productModel!.qty.toString();
-      driscripationController.text = widget.productModel!.description;
-      categoryValue = widget.productModel!.categoryName;
-      comapanyValue = widget.productModel!.companyName;
+      categoryValue = widget.productModel!.categoryName.toString();
+      comapanyValue = widget.productModel!.companyName.toString();
+      selectedImage =
+          widget.productModel!.productImg.map((e) => e.productImgg).toList();
     }
-
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +65,7 @@ class _AddProductState extends State<AddProduct> {
               children: [
                 AppTextfiled(
                   validation: (value) {
-                    if(value == null || value.trim().isEmpty)
-                    {
+                    if (value == null || value.trim().isEmpty) {
                       return "Required";
                     }
                     return null;
@@ -94,7 +83,7 @@ class _AddProductState extends State<AddProduct> {
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     return DropdownButtonFormField(
                       decoration: InputDecoration(
-                        hintText: "Company",
+                          hintText: "Company",
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10))),
                       value: comapanyValue,
@@ -103,7 +92,7 @@ class _AddProductState extends State<AddProduct> {
                             value: e.id, child: Text(e.get("company")));
                       }).toList(),
                       onChanged: (value) {
-                        print(value);
+                        logger.i(value);
                         setState(() {
                           comapanyValue = value;
                         });
@@ -130,9 +119,9 @@ class _AddProductState extends State<AddProduct> {
                             value: e.id, child: Text(e.get("category")));
                       }).toList(),
                       onChanged: (value) {
-                        print(value);
+                        logger.i(value);
                         setState(() {
-                          categoryValue = value.toString();
+                          categoryValue = value;
                         });
                       },
                     );
@@ -143,7 +132,7 @@ class _AddProductState extends State<AddProduct> {
                 ),
                 AppTextfiled(
                   validation: (value) {
-                    if(value == null || value.trim().isEmpty){
+                    if (value == null || value.trim().isEmpty) {
                       return "Required";
                     }
                     return null;
@@ -154,12 +143,11 @@ class _AddProductState extends State<AddProduct> {
                 ),
                 AppTextfiled(
                   validation: (value) {
-                    if(value == null || value.trim().isEmpty){
+                    if (value == null || value.trim().isEmpty) {
                       return "Requried";
                     }
                     return null;
                   },
-
                   onchanged: (value) {
                     if (value.length <= priceLength) {
                       text = value;
@@ -174,11 +162,10 @@ class _AddProductState extends State<AddProduct> {
                 ),
                 AppTextfiled(
                   validation: (value) {
-                    if(value == null || value.trim().isEmpty){
+                    if (value == null || value.trim().isEmpty) {
                       return "Requried";
                     }
-                      return null ;
-
+                    return null;
                   },
                   onchanged: (value) {
                     if (value.length <= qtyLength) {
@@ -200,7 +187,11 @@ class _AddProductState extends State<AddProduct> {
                   child: Text("upload Image :"),
                 ),
                 GestureDetector(
-                  onTap: pickImage,
+                  onTap: () async {
+                    if(selectedImage.isNotEmpty){
+                      await getImages();
+                    }
+                  },
                   child: Container(
                       height: 50,
                       width: 80,
@@ -211,68 +202,47 @@ class _AddProductState extends State<AddProduct> {
                                 blurRadius: 1.2,
                                 offset: Offset(0.0, 0.0),
                                 color: Colors.grey,
-                                blurStyle: BlurStyle.outer)
+                                blurStyle: BlurStyle.outer) 
                           ]),
                       child: const Icon(Icons.add)),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                /*GridView.builder(
-                  itemCount: selectedImage.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemBuilder: (context, index) {
-                   return Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                              offset: Offset(0.0, 0.0),
-                              blurRadius: 1.2,
-                              color: Colors.grey,
-                              blurStyle: BlurStyle.outer)
-                        ],
-                      ),
-                      child: !selectedImage[index].
-
-                    );;
-                  },),*/
-
-
+                Center(
+                  child: imageURL.isEmpty
+                      ? const Text('No image is uploaded.')
+                      : Image.network(imageURL),
+                ),
 
                 ElevatedButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus();
 
-                      if(formkey.currentState!.validate()){
-
-                        if(widget.productModel!.id.isNotEmpty){
-                          updateProduct(productModel: ProductModel(
-                            productName: productController.text,
-                            price: int.parse(priceController.text),
-                            qty: int.parse(qtyController.text),
-                            companyName: comapanyValue!,
-                            categoryName: categoryValue!,
-                            description: driscripationController.text,
-                          ));
-
-                        }else{
-                          addProduct(productModel: ProductModel(
-                            productName: productController.text,
-                            price: int.parse(priceController.text),
-                            companyName: comapanyValue!,
-                            categoryName: categoryValue!,
-                            description: driscripationController.text,
-                            qty: int.parse(qtyController.text),
-                          ));
+                      if (formkey.currentState!.validate()) {
+                        if (widget.productModel != null) {
+                          updateproduct(
+                            productModel: ProductModel(
+                              productName: productController.text,
+                              description: driscripationController.text,
+                              price: int.parse(priceController.text),
+                              qty: int.parse(qtyController.text),
+                              companyName: comapanyValue!,
+                              categoryName: categoryValue!,
+                            ),
+                          );
+                        } else {
+                          addproduct(
+                            productModel: ProductModel(
+                              productName: productController.text,
+                              description: driscripationController.text,
+                              price: int.parse(priceController.text),
+                              qty: int.parse(qtyController.text),
+                              companyName: comapanyValue!,
+                              categoryName: categoryValue!,
+                            ),
+                          );
                         }
-
                       }
 
                       clearText();
@@ -281,7 +251,7 @@ class _AddProductState extends State<AddProduct> {
                         fixedSize: const Size(330, 50),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    child: const Text("SAVE")),
+                    child: const Text("SaVE")),
               ],
             ),
           ),
@@ -290,112 +260,64 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
-  Future<void> addProduct({required ProductModel productModel}) {
-    return product
-        .add({productModel.tojson()})
-        .then((value) => print("product add sucessfully"))
-        .catchError((error) => print("failed"));
-  }
-  
-  Future<void> updateProduct({required ProductModel productModel})async{
+  Future<void> updateproduct({required ProductModel productModel}) async {
     return product
         .doc(widget.productModel!.id)
         .update(productModel.tojson())
-        .then((value) => print("updated sucessfully"))
-        .catchError((error) => print("$error Filed"));
+        .then((value) => logger.e("product add sucessfully"))
+        .catchError((error) => logger.e("Filed"));
   }
 
-  
-/*
-  void pickImage () async{
-    final firebasefirestore = FirebaseStorage.instance;
-    final imagePicker = ImagePicker();
-    PickedFile image;
-    await Permission.photos.request();
-    var permissionStatus = await Permission.photos.status;
+  Future<void> uploadImage(String file) async {
 
+    final ref = FirebaseStorage.instance.ref('images/');
+    final task = await ref.putFile(File(file));
+    final fileURL = (await task.ref.getDownloadURL());
+    setState(() {
+      imageURL = fileURL;
+    });
+  }
 
-    if(Permission.isGranted){
-      image = await imagePicker.getImage(source: ImageSource.gallery);
-      var file = File(image.path);
+  Future<void> addproduct({required ProductModel productModel}) {
+    FirebaseStorage.instance.ref('product').putFile(File(selectedImage.length as String));
 
+    return product
+        .add(productModel.tojson())
+        .then((value) => logger.d("product add sucessfully"))
+        .catchError((error) => logger.e("failed"));
+  }
 
-    }
-
+  Future getImages() async {
     final pickedFile = await picker.pickMultiImage(
-        imageQuality: 100, maxHeight: 10, maxWidth: 10
-
-    );
-    List<XFile> xfilepicked = pickedFile;
-
-    if(xfilepicked.isNotEmpty){
-
-      for(var i = 0; i<xfilepicked.length; i++)
-      {
-        selectedImage.add(xfilepicked[i].path as File);
-      }
-
-    setState(() {});
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Nothing is selected')));
-    }
-  }*/
-
-  final FirebaseFirestore  firebaseFirestore = FirebaseFirestore.instance;
-
- Future<String> uploadImage(String FileName, File file )async{
-    final reference  = FirebaseStorage.instance.ref().child("images");
-    final uploadTask = reference.putFile(file);
-    await uploadTask.whenComplete(() {});
-    final downloadlink = await reference.getDownloadURL();
-    return downloadlink;
-  }
-
-  void pickImage()async{
-    final pickedFile = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowMultiple: true,
-      allowedExtensions: ['jpeg','png','jpg'],
-    );
-    if(pickedFile != null){
-      String fileName = pickedFile.files[10].name;
-      /*for(var i = 0 ;i < fileName.length; i++){}*/
-      File  file = File(pickedFile.files[10].path!);
-      final downloadlink = await uploadImage(fileName,file);
-      await firebaseFirestore.collection("product").add({
-        "imageName":fileName,
-        "url":downloadlink,
-      });
-      print("null");
-
-
-      /*List<XFile> xfilepicked = pickedFile as List<XFile>;
-      if(xfilepicked.isNotEmpty){
-        for(var i = 0; i<xfilepicked.length; i++ )
-        {
-          selectedImage.add(xfilepicked[i].path as File);
+        imageQuality: 100, maxHeight: 1000, maxWidth: 1000);
+    List<XFile> xfilePick = pickedFile;
+    setState(
+      () {
+        if (xfilePick.isNotEmpty) {
+          for (var i = 0; i < xfilePick.length; i++) {
+            logger.i(xfilePick[i].path);
+            selectedImage.add(xfilePick[i].path.toString());
+          }
+          logger.i(selectedImage);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+            'Nothing is selected!',
+            style: TextStyle(
+              color: Colors.red,
+            ),
+          )));
         }
-        setState(() {});
-      }else{
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nothing is selected')));
-      }*/
-
-    }
-
-
+      },
+    );
   }
-
-
-
 
   clearText() {
     productController.clear();
     priceController.clear();
     qtyController.clear();
     driscripationController.clear();
-    categoryValue = null;
     comapanyValue = null;
+    categoryValue = null;
   }
-}/// all bad commit
+}

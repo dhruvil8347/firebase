@@ -6,7 +6,7 @@ class ProductModel{
   String categoryName;
   int price;
   int qty;
-  List<String> productImg;
+  List<ProductImg> productImg;
 
   ProductModel({
     this.id = "",
@@ -28,8 +28,9 @@ class ProductModel{
       description: json['description'] ?? "",
       price: json['price'] ?? 0,
       qty: json['qty'] ?? 0,
-      productImg: json['productImage'] ?? [],
-    );
+      productImg: List<ProductImg>.from(
+            (json['product_img'] ?? []).map((e) => ProductImg.fromJson(e))));
+
   }
 
   Map<String,dynamic>tojson()=>{
@@ -42,5 +43,35 @@ class ProductModel{
     "productImg" : productImg,
 
   };
+}
 
+
+class ProductImg {
+  int id;
+  int productId;
+  String productImgg;
+  String createdAt;
+
+  ProductImg({
+    this.id = 0,
+    this.productId = 0,
+    this.productImgg = "",
+    this.createdAt = "",
+  });
+
+  factory ProductImg.fromJson(Map<String, dynamic> json) {
+    return ProductImg(
+      id: json['id'] ?? 0,
+      productId: json['product_id'] ?? 0,
+      productImgg: json['product_img'] ?? "",
+      createdAt: json['created_at'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'product_id': productId,
+    'product_img': productImgg,
+    'created_at': createdAt,
+  };
 }

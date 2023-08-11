@@ -3,6 +3,7 @@ import 'package:firebase_project/comapny_screen.dart';
 import 'package:firebase_project/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:logger/logger.dart';
 
 
 
@@ -11,6 +12,8 @@ void main() async {
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
+
+       Logger logger = Logger();
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -38,7 +41,7 @@ class _ListappState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("FirebaseApp")),
+        title: const Center(child: Text("FirebaseApp")),
       ),
       body:
       Padding(
@@ -50,7 +53,7 @@ class _ListappState extends State<MyHomePage> {
             children: [
               GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ProductScreen() ,));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductScreen() ,));
                 },
                 child: Container(
                   height: 200,
@@ -65,7 +68,7 @@ class _ListappState extends State<MyHomePage> {
               const SizedBox(height: 30),
               GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryScreen(),));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CategoryScreen(),));
                 },
                 child: Container(
                   height: 200,
@@ -81,7 +84,7 @@ class _ListappState extends State<MyHomePage> {
 
               GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => CompanyScreen(),));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CompanyScreen(),));
                 },
                 child: Container(
                   height: 200,

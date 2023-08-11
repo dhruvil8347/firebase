@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'addproduct.dart';
+import 'addproduct_screen.dart';
+import 'main.dart';
 import 'model/product_model.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -12,9 +13,8 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   CollectionReference product =
-      FirebaseFirestore.instance.collection("product");
+  FirebaseFirestore.instance.collection("product");
   String id = "";
-
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +26,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>  AddProduct(
-                        productModel: ProductModel(),
-                      ),
+                      builder: (context) => const AddProduct(),
                     ));
               },
               icon: const Icon(Icons.add))
@@ -38,16 +36,14 @@ class _ProductScreenState extends State<ProductScreen> {
         children: [
           Expanded(
             child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection("product").snapshots(),
+              stream: FirebaseFirestore.instance.collection("product").snapshots(),
               builder: (context, snapshot) {
-
-                if(snapshot.hasData){
+                if (snapshot.hasData) {
                   return ListView(
                     children: snapshot.data!.docs.map((document) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Container(
+                        child: SizedBox(
                           height: 130,
                           width: 330,
                           child: Card(
@@ -66,23 +62,26 @@ class _ProductScreenState extends State<ProductScreen> {
                                 Padding(
                                   padding:
                                   const EdgeInsets.only(left: 10, top: 30),
-                                  child: Container(
+                                  child: SizedBox(
                                     width: 120,
-                                    child:  Column(
+                                    child: Column(
                                       crossAxisAlignment:
                                       CrossAxisAlignment.start,
                                       children: [
-                                        Text(document['productName'] ?? '',
-                                            style: TextStyle(fontSize: 18)),
-                                        Text(document['price'].toString() ?? "",
-                                            style: TextStyle(fontSize: 11)),
-                                        Text(document['qty'].toString() ?? "",
-                                            style: TextStyle(fontSize: 12)),
+                                        Text(document['productName'] ?? "",
+                                            style:
+                                            const TextStyle(fontSize: 18)),
+                                        Text((document['price'] ?? 0).toString(),
+                                            style:
+                                            const TextStyle(fontSize: 11)),
+                                        Text((document['qty'] ?? 0).toString(),
+                                            style:
+                                            const TextStyle(fontSize: 12)),
+
                                       ],
                                     ),
                                   ),
                                 ),
-
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
@@ -91,21 +90,35 @@ class _ProductScreenState extends State<ProductScreen> {
                                     ),
                                     ElevatedButton(
                                         onPressed: () {
-                                          ProductModel productModel =   ProductModel(
+                                          ProductModel productModel =
+                                          ProductModel(
                                               id: document.id,
                                               productName:
-                                              document['productName'] ?? '',
-                                              categoryName: document['categoryName'] ?? '',
-                                              companyName: document['companyName'] ?? '',
+                                              document['productName'] ??
+                                                  '',
+                                              categoryName: document[
+                                              'categoryName'] ??
+                                                  '',
+                                              companyName:
+                                              document['companyName'] ??
+                                                  '',
                                               qty: document['qty'] ?? 0,
                                               price: document['price'] ?? 0,
-                                              description: document['description'] ?? '');
+                                              description:
+                                              document['description'] ??
+                                                  '');
 
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(
-                                            productModel: productModel,
-                                          ),));
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AddProduct(
+                                                        productModel:
+                                                        productModel,
+                                                      )
+                                              )
+                                          );
                                         },
-
                                         style: ElevatedButton.styleFrom(
                                             fixedSize: const Size(80, 30)),
                                         child: const Text("Edit")),
@@ -115,19 +128,22 @@ class _ProductScreenState extends State<ProductScreen> {
                                             context: context,
                                             builder: (context) {
                                               return AlertDialog(
-                                                title: Text("Delete",
+                                                title: const Text("Delete",
                                                     style: TextStyle(
                                                         color: Colors.red)),
-                                                content: Text(
+                                                content: const Text(
                                                     "Are you Sure if you want to Delete?"),
                                                 actions: [
                                                   TextButton(
                                                       onPressed: () {},
-                                                      child: Text("Cancel")),
+                                                      child:
+                                                      const Text("Cancel")),
                                                   TextButton(
                                                       onPressed: () {
-                                                        deleteProduct(document.id);
-                                                        Navigator.of(context).pop();
+                                                        deleteProduct(
+                                                            document.id);
+                                                        Navigator.of(context)
+                                                            .pop();
                                                       },
                                                       child: const Text(
                                                         "Delete",
@@ -150,12 +166,10 @@ class _ProductScreenState extends State<ProductScreen> {
                           ),
                         ),
                       );
-                    }
-                    ).toList(),
+                    }).toList(),
                   );
                 }
-                return Center(child: CircularProgressIndicator());
-
+                return const Center(child: CircularProgressIndicator());
               },
             ),
           )
@@ -168,15 +182,9 @@ class _ProductScreenState extends State<ProductScreen> {
     return product
         .doc(id)
         .delete()
-        .then((value) => print("Delete successfully"))
-        .catchError((error) => print("Filed $error"));
+        .then((value) => logger.i("Delete successfully"))
+        .catchError((error) => logger.i("Filed $error"));
   }
+}
 
-
-
-  Future<void> editProduct(String id) {
-    return product.doc(id).update({
-
-    });
-  }
-}///all good commit
+/// all good commit

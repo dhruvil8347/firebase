@@ -1,5 +1,5 @@
+import 'package:firebase_project/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -45,7 +45,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             const SizedBox(height: 10),
             ElevatedButton(
               onLongPress: (){
-                print('null');
+                logger.i('null');
               },
                 onPressed: () {
                   if(formkey.currentState!.validate()){
@@ -91,7 +91,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     child: Text(
                                       document['category'],
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(color: Colors.white),
+                                      style: const TextStyle(color: Colors.white),
                                     ),
                                   ),
                                   Row(
@@ -150,17 +150,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         }).toList(),
                       );
                     }
-                    return Center(child: const CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }),
             ),
-            /*Expanded(
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-
-                },
-              ),
-            )*/
           ],
         ),
       ),
@@ -177,8 +169,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return category
         .doc(id)
         .delete()
-        .then((value) => print("Deleted user"))
-        .catchError((error) => print("filed$error"));
+        .then((value) => logger.i("Deleted user"))
+        .catchError((error) => logger.i("filed$error"));
   }
 
 

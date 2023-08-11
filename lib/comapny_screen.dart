@@ -1,6 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'main.dart';
 
 class CompanyScreen extends StatefulWidget {
   const CompanyScreen({Key? key}) : super(key: key);
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<CompanyScreen> {
             ),
             ElevatedButton(
                 onLongPress: (){
-                  print('null');
+                  logger.i('null');
                 },
                 onPressed: () {
                   FocusScope.of(context).unfocus();
@@ -168,7 +169,7 @@ class _MyHomePageState extends State<CompanyScreen> {
                       );
                     }).toList());
                   }
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 },
               ),
             ),
@@ -189,16 +190,16 @@ class _MyHomePageState extends State<CompanyScreen> {
     return company
         .doc(id)
         .delete()
-        .then((value) => print("Deleted user"))
-        .catchError((error) => print("Failed $error"));
+        .then((value) => logger.i("Deleted user"))
+        .catchError((error) => logger.i("Failed $error"));
   }
 
   Future<void> updatecompany(String id) {
     return company
         .doc(id)
         .update({"company": companyCtrl.text})
-        .then((value) => print("upadated user"))
-        .catchError((error) => print("failed $error"));
+        .then((value) => logger.i("upadated user"))
+        .catchError((error) => logger.i("failed $error"));
   }
 
   clearText() {
