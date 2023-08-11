@@ -321,3 +321,4 @@ class _AddProductState extends State<AddProduct> {
     categoryValue = null;
   }
 }
+/// all bad committtt
