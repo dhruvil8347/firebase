@@ -43,6 +43,7 @@ dependencies:
   permission_handler:
   file_picker: ^5.3.3
   logger: ^2.0.1
+  carousel_slider: ^4.2.1
 
 
 

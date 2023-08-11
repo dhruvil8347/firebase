@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'main.dart';
 
 class CompanyScreen extends StatefulWidget {
@@ -72,8 +71,6 @@ class _MyHomePageState extends State<CompanyScreen> {
               padding: EdgeInsets.only(top: 25, right: 180, bottom: 10),
               child: Text("List of companies"),
             ),
-
-
 
             Expanded(
               child: StreamBuilder(

@@ -29,11 +29,13 @@ class _AddProductState extends State<AddProduct> {
   final int priceLength = 5;
   String text = "";
   final int qtyLength = 2;
-  String? comapanyValue;
+  String? companyValue;
   String? categoryValue;
   List<String> selectedImage = [];
   final picker = ImagePicker();
   String imageURL = '';
+  List<int> removeImg = [];
+  ProductModel productmodel = ProductModel();
 
   @override
   void initState() {
@@ -44,7 +46,7 @@ class _AddProductState extends State<AddProduct> {
       priceController.text = widget.productModel!.price.toString();
       qtyController.text = widget.productModel!.qty.toString();
       categoryValue = widget.productModel!.categoryName.toString();
-      comapanyValue = widget.productModel!.companyName.toString();
+      companyValue = widget.productModel!.companyName.toString();
       selectedImage =
           widget.productModel!.productImg.map((e) => e.productImgg).toList();
     }
@@ -76,6 +78,7 @@ class _AddProductState extends State<AddProduct> {
                 const SizedBox(
                   height: 10,
                 ),
+
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('company')
@@ -86,7 +89,7 @@ class _AddProductState extends State<AddProduct> {
                           hintText: "Company",
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10))),
-                      value: comapanyValue,
+                      value: companyValue,
                       items: snapshot.data?.docs.map((e) {
                         return DropdownMenuItem(
                             value: e.id, child: Text(e.get("company")));
@@ -94,7 +97,7 @@ class _AddProductState extends State<AddProduct> {
                       onChanged: (value) {
                         logger.i(value);
                         setState(() {
-                          comapanyValue = value;
+                          companyValue = value;
                         });
                       },
                     );
@@ -188,9 +191,8 @@ class _AddProductState extends State<AddProduct> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    if(selectedImage.isNotEmpty){
-                      await getImages();
-                    }
+                    await getImages();
+                    /*uploadImage(selectedImage.last);*/
                   },
                   child: Container(
                       height: 50,
@@ -202,23 +204,114 @@ class _AddProductState extends State<AddProduct> {
                                 blurRadius: 1.2,
                                 offset: Offset(0.0, 0.0),
                                 color: Colors.grey,
-                                blurStyle: BlurStyle.outer) 
+                                blurStyle: BlurStyle.outer)
                           ]),
                       child: const Icon(Icons.add)),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        width: 145,
+                        height: 120,
+                        child: selectedImage.isEmpty
+                            ? const Center(
+                                child: Text(
+                                "Image not found",
+                                style: TextStyle(color: Colors.red),
+                              ))
+                            : GridView.builder(
+                                itemCount: selectedImage.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                            offset: Offset(0.0, 0.0),
+                                            blurRadius: 1.2,
+                                            color: Colors.grey,
+                                            blurStyle: BlurStyle.outer)
+                                      ],
+                                    ),
+                                    child: !selectedImage[index]
+                                            .contains("data/user")
+                                        ? Stack(
+                                            children: [
+                                              Center(
+                                                child: Image.network(
+                                                  selectedImage[index],
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                  onTap: () {
+                                                    if (!selectedImage[index]
+                                                        .contains("https://")) {
+                                                      removeImg.add(productmodel
+                                                          .productImg[index]
+                                                          .id as int);
+                                                    }
+                                                    selectedImage
+                                                        .removeAt(index);
+                                                    setState(() {});
+                                                    print(
+                                                        "REMOVE IMG => ${removeImg}");
+                                                  },
+                                                  child: Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                  )),
+                                            ],
+                                          )
+                                        : Stack(
+                                            children: [
+                                              Center(
+                                                child: Image.file(
+                                                  File(selectedImage[index]),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                  onTap: () {
+                                                    selectedImage
+                                                        .removeAt(index);
+                                                    setState(() {});
+                                                    print(
+                                                        "REMOVE IMG => ${removeImg}");
+                                                  },
+                                                  child: Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                  )),
+                                            ],
+                                          ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
                 Center(
                   child: imageURL.isEmpty
                       ? const Text('No image is uploaded.')
                       : Image.network(imageURL),
                 ),
-
                 ElevatedButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus();
-
                       if (formkey.currentState!.validate()) {
                         if (widget.productModel != null) {
                           updateproduct(
@@ -227,7 +320,7 @@ class _AddProductState extends State<AddProduct> {
                               description: driscripationController.text,
                               price: int.parse(priceController.text),
                               qty: int.parse(qtyController.text),
-                              companyName: comapanyValue!,
+                              companyName: companyValue!,
                               categoryName: categoryValue!,
                             ),
                           );
@@ -238,20 +331,19 @@ class _AddProductState extends State<AddProduct> {
                               description: driscripationController.text,
                               price: int.parse(priceController.text),
                               qty: int.parse(qtyController.text),
-                              companyName: comapanyValue!,
+                              /* companyName: comapanyValue!,*/
                               categoryName: categoryValue!,
                             ),
                           );
                         }
                       }
-
                       clearText();
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(330, 50),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    child: const Text("SaVE")),
+                    child: const Text("SAVE")),
               ],
             ),
           ),
@@ -269,7 +361,6 @@ class _AddProductState extends State<AddProduct> {
   }
 
   Future<void> uploadImage(String file) async {
-
     final ref = FirebaseStorage.instance.ref('images/');
     final task = await ref.putFile(File(file));
     final fileURL = (await task.ref.getDownloadURL());
@@ -279,8 +370,13 @@ class _AddProductState extends State<AddProduct> {
   }
 
   Future<void> addproduct({required ProductModel productModel}) {
-    FirebaseStorage.instance.ref('product').putFile(File(selectedImage.length as String));
+    /*FirebaseStorage.instance.ref('product').putFile(File(selectedImage.single));*/
 
+  /*  FirebaseStorage.instance
+        .ref('product')
+        .putFile(File(selectedImage.length as String));*/
+    /*Map<String,dynamic> body ={};
+    body.addAll({productModel.productImg.});*/
     return product
         .add(productModel.tojson())
         .then((value) => logger.d("product add sucessfully"))
@@ -312,13 +408,14 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
+
   clearText() {
     productController.clear();
     priceController.clear();
     qtyController.clear();
     driscripationController.clear();
-    comapanyValue = null;
+    companyValue = null;
     categoryValue = null;
+    selectedImage.isEmpty;
   }
 }
-/// all bad committtt

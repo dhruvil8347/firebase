@@ -35,7 +35,7 @@ class ProductModel{
 
   Map<String,dynamic>tojson()=>{
     "productName" : productName,
-    "companyName ": companyName,
+    "companyName":   companyName,
     "categoryName" : categoryName,
     "description" : description,
     "price" : price,
@@ -47,13 +47,13 @@ class ProductModel{
 
 
 class ProductImg {
-  int id;
+  String id;
   int productId;
   String productImgg;
   String createdAt;
 
   ProductImg({
-    this.id = 0,
+    this.id = "",
     this.productId = 0,
     this.productImgg = "",
     this.createdAt = "",
@@ -61,8 +61,8 @@ class ProductImg {
 
   factory ProductImg.fromJson(Map<String, dynamic> json) {
     return ProductImg(
-      id: json['id'] ?? 0,
-      productId: json['product_id'] ?? 0,
+      id: json['id'] ?? '',
+      productId: json['product_id'] ?? '',
       productImgg: json['product_img'] ?? "",
       createdAt: json['created_at'] ?? "",
     );

@@ -172,7 +172,4 @@ class _CategoryScreenState extends State<CategoryScreen> {
         .then((value) => logger.i("Deleted user"))
         .catchError((error) => logger.i("filed$error"));
   }
-
-
-
 }
