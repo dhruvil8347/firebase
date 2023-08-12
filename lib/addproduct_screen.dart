@@ -17,6 +17,7 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
+
   CollectionReference product =
       FirebaseFirestore.instance.collection("product");
 
@@ -32,6 +33,7 @@ class _AddProductState extends State<AddProduct> {
   String? companyValue;
   String? categoryValue;
   List<String> selectedImage = [];
+  List<String> templist = [];
   final picker = ImagePicker();
   String imageURL = '';
   List<int> removeImg = [];
@@ -47,8 +49,7 @@ class _AddProductState extends State<AddProduct> {
       qtyController.text = widget.productModel!.qty.toString();
       categoryValue = widget.productModel!.categoryName.toString();
       companyValue = widget.productModel!.companyName.toString();
-      selectedImage =
-          widget.productModel!.productImg.map((e) => e.productImgg).toList();
+      selectedImage = widget.productModel!.productImg.cast<String>();
     }
   }
 
@@ -78,7 +79,6 @@ class _AddProductState extends State<AddProduct> {
                 const SizedBox(
                   height: 10,
                 ),
-
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('company')
@@ -211,7 +211,6 @@ class _AddProductState extends State<AddProduct> {
                 const SizedBox(
                   height: 10,
                 ),
-
                 Row(
                   children: [
                     Expanded(
@@ -260,16 +259,15 @@ class _AddProductState extends State<AddProduct> {
                                                     if (!selectedImage[index]
                                                         .contains("https://")) {
                                                       removeImg.add(productmodel
-                                                          .productImg[index]
-                                                          .id as int);
+                                                          .productImg[index] as int);
                                                     }
                                                     selectedImage
                                                         .removeAt(index);
                                                     setState(() {});
-                                                    print(
-                                                        "REMOVE IMG => ${removeImg}");
+                                                    logger.d(
+                                                        "REMOVE IMG => $removeImg");
                                                   },
-                                                  child: Icon(
+                                                  child: const Icon(
                                                     Icons.close,
                                                     color: Colors.red,
                                                   )),
@@ -288,10 +286,10 @@ class _AddProductState extends State<AddProduct> {
                                                     selectedImage
                                                         .removeAt(index);
                                                     setState(() {});
-                                                    print(
-                                                        "REMOVE IMG => ${removeImg}");
+                                                    logger.t(
+                                                        "REMOVE IMG => $removeImg");
                                                   },
-                                                  child: Icon(
+                                                  child: const Icon(
                                                     Icons.close,
                                                     color: Colors.red,
                                                   )),
@@ -310,10 +308,15 @@ class _AddProductState extends State<AddProduct> {
                       : Image.network(imageURL),
                 ),
                 ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       FocusScope.of(context).unfocus();
                       if (formkey.currentState!.validate()) {
                         if (widget.productModel != null) {
+                          List<String> tempListImgUrl = [];
+                          for (int a = 0; a < selectedImage.length; a++) {
+                            String url = await uploadImage(selectedImage[a]);
+                            tempListImgUrl.add(url);
+                          }
                           updateproduct(
                             productModel: ProductModel(
                               productName: productController.text,
@@ -322,17 +325,24 @@ class _AddProductState extends State<AddProduct> {
                               qty: int.parse(qtyController.text),
                               companyName: companyValue!,
                               categoryName: categoryValue!,
+                              productImg: tempListImgUrl,
                             ),
                           );
                         } else {
+                          List<String> tempListImgUrl = [];
+                          for (int a = 0; a < selectedImage.length; a++) {
+                            String url = await uploadImage(selectedImage[a]);
+                            tempListImgUrl.add(url);
+                          }
                           addproduct(
                             productModel: ProductModel(
                               productName: productController.text,
                               description: driscripationController.text,
                               price: int.parse(priceController.text),
                               qty: int.parse(qtyController.text),
-                              /* companyName: comapanyValue!,*/
+                              companyName: companyValue!,
                               categoryName: categoryValue!,
+                              productImg: tempListImgUrl,
                             ),
                           );
                         }
@@ -360,33 +370,35 @@ class _AddProductState extends State<AddProduct> {
         .catchError((error) => logger.e("Filed"));
   }
 
-  Future<void> uploadImage(String file) async {
-    final ref = FirebaseStorage.instance.ref('images/');
+  Future<String> uploadImage(String file) async {
+    String name = DateTime.now().toString();
+    final ref = FirebaseStorage.instance.ref('images/$name.jpg');
     final task = await ref.putFile(File(file));
     final fileURL = (await task.ref.getDownloadURL());
-    setState(() {
-      imageURL = fileURL;
-    });
+    setState(() {});
+    return fileURL;
   }
 
-  Future<void> addproduct({required ProductModel productModel}) {
-    /*FirebaseStorage.instance.ref('product').putFile(File(selectedImage.single));*/
+  Future<void> addproduct({required ProductModel productModel}) async {
 
-  /*  FirebaseStorage.instance
+    /*FirebaseStorage.instance.ref('product').putFile(File(selectedImage.single));*/
+    /*  FirebaseStorage.instance
         .ref('product')
         .putFile(File(selectedImage.length as String));*/
     /*Map<String,dynamic> body ={};
     body.addAll({productModel.productImg.});*/
+
     return product
         .add(productModel.tojson())
         .then((value) => logger.d("product add sucessfully"))
-        .catchError((error) => logger.e("failed"));
+        .catchError((error) => logger.e("FIREBASE FAILED"));
   }
 
   Future getImages() async {
     final pickedFile = await picker.pickMultiImage(
         imageQuality: 100, maxHeight: 1000, maxWidth: 1000);
     List<XFile> xfilePick = pickedFile;
+
     setState(
       () {
         if (xfilePick.isNotEmpty) {
@@ -407,7 +419,6 @@ class _AddProductState extends State<AddProduct> {
       },
     );
   }
-
 
   clearText() {
     productController.clear();

@@ -6,7 +6,7 @@ class ProductModel{
   String categoryName;
   int price;
   int qty;
-  List<ProductImg> productImg;
+  List<String> productImg;
 
   ProductModel({
     this.id = "",
@@ -17,7 +17,7 @@ class ProductModel{
     this.price = 0,
     this.qty = 0,
     this.productImg = const [],
-});
+  });
 
   factory ProductModel.formjson(Map<String,dynamic>json){
     return ProductModel(
@@ -28,8 +28,7 @@ class ProductModel{
       description: json['description'] ?? "",
       price: json['price'] ?? 0,
       qty: json['qty'] ?? 0,
-      productImg: List<ProductImg>.from(
-            (json['product_img'] ?? []).map((e) => ProductImg.fromJson(e))));
+      productImg: json['product_img'] ?? [],);
 
   }
 

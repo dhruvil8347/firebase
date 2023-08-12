@@ -64,12 +64,10 @@ class _ProductScreenState extends State<ProductScreen> {
                                   const SizedBox(
                                     width: 10,
                                   ),
-                                  Container(
-                                    height: 70,
-                                    width: 70,
-                                    color: Colors.blue,
-                                 /*   child: Image.network(),*/
-                                  ),
+                                  SizedBox(
+                                      width: 70,
+                                      height: 70,
+                                      child: Image.network(document['productImg'][1] ?? [])),
                                   Padding(
                                     padding:
                                     const EdgeInsets.only(left: 10, top: 30),
@@ -110,7 +108,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                                 id: document.id,
                                                 productName: document['productName']   ??'',
                                                 categoryName: document['categoryName'] ?? '',
-                                                 companyName:document['companyName']    ?? '',
+                                                companyName:document['companyName']    ?? '',
                                                 qty: document['qty'] ?? 0,
                                                 price: document['price'] ?? 0,
                                                 description:document['description'] ??'');
