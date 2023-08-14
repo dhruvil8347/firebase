@@ -32,7 +32,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     ));
               },
               icon: const Icon(Icons.add))
-        ],
+        ],//l;l;;;l;l;;;;;l;;l;l;l;l;;;;l;l;;;;;l;;;;;;l;;;;;;l;;;;;;l;;;;;;l;;;;;l;;;;;l;;;;l;;;;l;;;l;;;
       ),
       body: Column(
         children: [
