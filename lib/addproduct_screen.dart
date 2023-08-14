@@ -32,6 +32,10 @@ class _AddProductState extends State<AddProduct> {
   final int qtyLength = 2;
   String? companyValue;
   String? categoryValue;
+  String? company;
+  String? category;
+
+
   List<String> selectedImage = [];
   List<String> templist = [];
   final picker = ImagePicker();
@@ -292,7 +296,8 @@ class _AddProductState extends State<AddProduct> {
                                                   child: const Icon(
                                                     Icons.close,
                                                     color: Colors.red,
-                                                  )),
+                                                  )
+                                              ),
                                             ],
                                           ),
                                   );
@@ -342,6 +347,8 @@ class _AddProductState extends State<AddProduct> {
                               qty: int.parse(qtyController.text),
                               companyName: companyValue!,
                               categoryName: categoryValue!,
+                            /*  category: companyValue!,*/
+
                               productImg: tempListImgUrl,
                             ),
                           );
@@ -389,7 +396,9 @@ class _AddProductState extends State<AddProduct> {
     body.addAll({productModel.productImg.});*/
 
     return product
-        .add(productModel.tojson())
+        .add(
+          productModel.tojson(),
+         )
         .then((value) => logger.d("product add sucessfully"))
         .catchError((error) => logger.e("FIREBASE FAILED"));
   }

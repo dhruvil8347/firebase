@@ -14,7 +14,7 @@ class ProductScreen extends StatefulWidget {
 
 class _ProductScreenState extends State<ProductScreen> {
   CollectionReference product =
-  FirebaseFirestore.instance.collection("product");
+      FirebaseFirestore.instance.collection("product");
   String id = "";
   List<ProductModel> productlist = [];
 
@@ -29,63 +29,104 @@ class _ProductScreenState extends State<ProductScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const AddProduct(),
-                    )
-                );
+                    ));
               },
               icon: const Icon(Icons.add))
         ],
       ),
       body: Column(
         children: [
+          /*      FutureBuilder(
+            future: Future.value(),
+              builder:(context, snapshot) {
+                if(snapshot.hasData){
+                  return ListView(
+
+                  );
+                }
+              },
+          ),*/
+
           Expanded(
             child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection("product").snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection("product").snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return InkWell(
-                    onTap: (){
-                   Navigator.push(context, MaterialPageRoute(
-                     builder: (context) => DetailScreen(
-                         productListModel: ProductModel()),));
-                    },
-
-                    child: ListView(
-                      children: snapshot.data!.docs.map((document) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                  return ListView(
+                    children: snapshot.data!.docs.map((document) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailScreen(
+                                      productListModel: ProductModel(
+                                    productName: document['productName'] ?? "",
+                                    price: document['price'] ?? 0,
+                                    qty: document['qty'] ?? 0,
+                                    description: document['description'] ?? "",
+                                    companyName: document['companyName'] ?? '',
+                                    categoryName:
+                                        document['categoryName'] ?? '',
+                                    productImg: document['productImg'] ?? [],
+                                  )),
+                                ));
+                          },
                           child: SizedBox(
                             height: 130,
                             width: 330,
                             child: Card(
                               elevation: 2,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   const SizedBox(
                                     width: 10,
                                   ),
-                                  SizedBox(
-                                      width: 70,
-                                      height: 70,
-                                      child: Image.network(document['productImg'][1] ?? [])),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DetailScreen(
+                                                productListModel: ProductModel(
+                                              id: id,
+                                              productName:
+                                                  document['productName'] ?? '',
+                                            )),
+                                          ));
+                                    },
+                                    child: SizedBox(
+                                        width: 70,
+                                        height: 70,
+                                        child: Image.network(
+                                            document['productImg'][1] ?? [])),
+                                  ),
                                   Padding(
-                                    padding:
-                                    const EdgeInsets.only(left: 10, top: 30),
+                                    padding: const EdgeInsets.only(
+                                        left: 10, top: 30),
                                     child: SizedBox(
                                       width: 120,
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(document['productName'] ?? "",
-                                              style:
-                                              const TextStyle(fontSize: 18)),
-                                          Text((document['price'] ?? 0).toString(),
-                                              style:
-                                              const TextStyle(fontSize: 11)),
-                                          Text((document['qty'] ?? 0).toString(),
-                                              style:
-                                              const TextStyle(fontSize: 12)),
+                                              style: const TextStyle(
+                                                  fontSize: 18)),
+                                          Text(
+                                              (document['price'] ?? 0)
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 11)),
+                                          Text(
+                                              (document['qty'] ?? 0).toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12)),
                                         ],
                                       ),
                                     ),
@@ -106,16 +147,29 @@ class _ProductScreenState extends State<ProductScreen> {
                                             // print(document['description']);
                                             var model = ProductModel(
                                                 id: document.id,
-                                                productName: document['productName']   ??'',
-                                                categoryName: document['categoryName'] ?? '',
-                                                companyName:document['companyName']    ?? '',
+                                                productName:
+                                                    document['productName'] ??
+                                                        '',
+                                                categoryName:
+                                                    document['categoryName'] ??
+                                                        '',
+                                                companyName:
+                                                    document['companyName'] ??
+                                                        '',
                                                 qty: document['qty'] ?? 0,
                                                 price: document['price'] ?? 0,
-                                                description:document['description'] ??'');
-                                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddProduct(productModel:model))
+                                                description:
+                                                    document['description'] ??
+                                                        '');
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AddProduct(
+                                                            productModel:
+                                                                model))
 
-                                            // Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(productModel: productModel,))
-                                            );
+                                                // Navigator.push(context, MaterialPageRoute(builder: (context) => AddProduct(productModel: productModel,))
+                                                );
                                           },
                                           style: ElevatedButton.styleFrom(
                                               fixedSize: const Size(80, 30)),
@@ -134,8 +188,8 @@ class _ProductScreenState extends State<ProductScreen> {
                                                   actions: [
                                                     TextButton(
                                                         onPressed: () {},
-                                                        child:
-                                                        const Text("Cancel")),
+                                                        child: const Text(
+                                                            "Cancel")),
                                                     TextButton(
                                                         onPressed: () {
                                                           deleteProduct(
@@ -146,7 +200,8 @@ class _ProductScreenState extends State<ProductScreen> {
                                                         child: const Text(
                                                           "Delete",
                                                           style: TextStyle(
-                                                              color: Colors.red),
+                                                              color:
+                                                                  Colors.red),
                                                         )),
                                                   ],
                                                 );
@@ -163,9 +218,9 @@ class _ProductScreenState extends State<ProductScreen> {
                               ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
+                        ),
+                      );
+                    }).toList(),
                   );
                 }
                 return const Center(child: CircularProgressIndicator());

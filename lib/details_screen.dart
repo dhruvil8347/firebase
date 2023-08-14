@@ -1,26 +1,29 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_project/addproduct_screen.dart';
 import 'package:flutter/material.dart';
+import 'main.dart';
 import 'model/product_model.dart';
 
-
-
 class DetailScreen extends StatefulWidget {
-   DetailScreen({Key? key, required this.productListModel}) : super(key: key);
+  DetailScreen({Key? key, required this.productListModel}) : super(key: key);
 
   final ProductModel productListModel;
-
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  CollectionReference product =
+      FirebaseFirestore.instance.collection("product");
+  List<ProductModel> productlist = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body:
-      Padding(
+      body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
@@ -28,7 +31,10 @@ class _DetailScreenState extends State<DetailScreen> {
               items: widget.productListModel.productImg.map((e) {
                 return Builder(
                   builder: (context) {
-                    return const Text("1");
+                    return Image.network(
+                      e,
+                      fit: BoxFit.cover,
+                    );
                   },
                 );
               }).toList(),
@@ -42,8 +48,7 @@ class _DetailScreenState extends State<DetailScreen> {
               children: [
                 SizedBox(
                   width: 230,
-                  child: Text(
-                      "Product: ${widget.productListModel.productName}",
+                  child: Text("Product:${widget.productListModel.productName}",
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontSize: 15, height: 3)),
                 ),
@@ -60,7 +65,7 @@ class _DetailScreenState extends State<DetailScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 210),
               child: Text(
-                widget.productListModel.categoryName,
+                "Category: ${widget.productListModel.categoryName}",
                 style: const TextStyle(fontSize: 9, color: Colors.grey),
               ),
             ),
@@ -70,7 +75,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 SizedBox(
                   width: 230,
                   child: Text(
-                    "Company: ${widget.productListModel.companyName}",
+                    "Company:${widget.productListModel.companyName}",
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(height: 3, fontSize: 15),
                   ),
@@ -98,14 +103,13 @@ class _DetailScreenState extends State<DetailScreen> {
               children: [
                 ElevatedButton(
                     onPressed: () {
-                     /* Navigator.push(
+                      Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => AddProduct(
-                                productListModel: widget.productListModel),
-                          )).then((value) {
-                        *//* getproduct();*//*
-                      });*/
+                              productModel: widget.productListModel
+                            ),
+                          ));
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(120, 30)),
@@ -120,7 +124,8 @@ class _DetailScreenState extends State<DetailScreen> {
                           return AlertDialog(
                             title: const Text("Delete",
                                 style: TextStyle(color: Colors.red)),
-                            content: const Text("Are you sure you want to delete?"),
+                            content:
+                                const Text("Are you sure you want to delete?"),
                             actions: [
                               TextButton(
                                   onPressed: () {
@@ -135,7 +140,17 @@ class _DetailScreenState extends State<DetailScreen> {
                                   child: const Text(
                                     "Delete",
                                     style: TextStyle(color: Colors.red),
-                                  ))*/
+                                  )
+                               )*/
+
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "Delete",
+                                    style: TextStyle(color: Colors.red),
+                                  )),
                             ],
                           );
                         },
@@ -148,5 +163,13 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> deleteProduct(String id) {
+    return product
+        .doc(id)
+        .delete()
+        .then((value) => logger.i("Delete successfully"))
+        .catchError((error) => logger.i("Filed $error"));
   }
 }

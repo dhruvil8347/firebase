@@ -3,10 +3,12 @@ class ProductModel{
   String productName;
   String description;
   String companyName;
+  String company; //company
+  String category; // category
   String categoryName;
   int price;
   int qty;
-  List<String> productImg;
+  List productImg;
 
   ProductModel({
     this.id = "",
@@ -14,6 +16,8 @@ class ProductModel{
     this.categoryName= "",
     this.productName = "",
     this.description = "",
+    this.category = "", // category
+    this.company = "",  // company
     this.price = 0,
     this.qty = 0,
     this.productImg = const [],
@@ -25,9 +29,12 @@ class ProductModel{
       productName: json['productName'] ?? "",
       companyName: json['companyName'] ?? "",
       categoryName:json['categoryName'] ?? "",
+      company: json['company'] ?? "",
+      category: json['category'] ?? '',
       description: json['description'] ?? "",
       price: json['price'] ?? 0,
       qty: json['qty'] ?? 0,
+
       productImg: json['product_img'] ?? [],);
 
   }
@@ -37,6 +44,8 @@ class ProductModel{
     "companyName":   companyName,
     "categoryName" : categoryName,
     "description" : description,
+    "company" : company, // company
+    "category" : category,  // category
     "price" : price,
     "qty" : qty,
     "productImg" : productImg,
