@@ -199,6 +199,7 @@ class _MyHomePageState extends State<CompanyScreen> {
         .catchError((error) => logger.i("failed $error"));
   }
 
+
   clearText() {
     companyCtrl.clear();
     id = "";

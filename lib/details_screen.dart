@@ -1,3 +1,4 @@
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_project/addproduct_screen.dart';
@@ -15,9 +16,35 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  CollectionReference product =
+  final CollectionReference product =
       FirebaseFirestore.instance.collection("product");
   List<ProductModel> productlist = [];
+  final CollectionReference company =
+  FirebaseFirestore.instance.collection("company");
+  String cpyName  = "";
+  final CollectionReference category =
+  FirebaseFirestore.instance.collection("category");
+  String categoryName =  "";
+
+  @override
+  void initState() {
+    getcompany();
+    super.initState();
+  }
+
+  getcompany()async{
+    List a = await company.get().then((value) => value.docs.where((element) => element.id == widget.productListModel.companyName).toList()) ;
+    List b = await category.get().then((value) => value.docs.where((element) => element.id == widget.productListModel.categoryName).toList()) ;
+    cpyName = a[0]['company'];
+    categoryName = b[0]['category'];
+    logger.t(categoryName);
+    logger.f(cpyName);
+
+    setState(() {
+
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +92,7 @@ class _DetailScreenState extends State<DetailScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 210),
               child: Text(
-                "Category: ${widget.productListModel.categoryName}",
+                "Category : ${categoryName}",
                 style: const TextStyle(fontSize: 9, color: Colors.grey),
               ),
             ),
@@ -75,7 +102,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 SizedBox(
                   width: 230,
                   child: Text(
-                    "Company:${widget.productListModel.companyName}",
+                    "Company : ${cpyName}",
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(height: 3, fontSize: 15),
                   ),
@@ -144,7 +171,8 @@ class _DetailScreenState extends State<DetailScreen> {
                                )*/
 
                               TextButton(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    await deleteProduct(widget.productListModel.id);
                                     Navigator.of(context).pop();
                                   },
                                   child: Text(
@@ -172,4 +200,6 @@ class _DetailScreenState extends State<DetailScreen> {
         .then((value) => logger.i("Delete successfully"))
         .catchError((error) => logger.i("Filed $error"));
   }
+
+
 }

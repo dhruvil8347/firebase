@@ -32,20 +32,11 @@ class _ProductScreenState extends State<ProductScreen> {
                     ));
               },
               icon: const Icon(Icons.add))
-        ],//l;l;;;l;l;;;;;l;;l;l;l;l;;;;l;l;;;;;l;;;;;;l;;;;;;l;;;;;;l;;;;;;l;;;;;l;;;;;l;;;;l;;;;l;;;l;;;
+        ],
       ),
       body: Column(
         children: [
-          /*      FutureBuilder(
-            future: Future.value(),
-              builder:(context, snapshot) {
-                if(snapshot.hasData){
-                  return ListView(
 
-                  );
-                }
-              },
-          ),*/
 
           Expanded(
             child: StreamBuilder(
@@ -64,6 +55,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => DetailScreen(
                                       productListModel: ProductModel(
+                                        id: document.id,
                                     productName: document['productName'] ?? "",
                                     price: document['price'] ?? 0,
                                     qty: document['qty'] ?? 0,
@@ -104,7 +96,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                         width: 70,
                                         height: 70,
                                         child: Image.network(
-                                            document['productImg'][1] ?? [])),
+                                            document['productImg'][0] ?? [])),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(
@@ -158,9 +150,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                                         '',
                                                 qty: document['qty'] ?? 0,
                                                 price: document['price'] ?? 0,
+                                                productImg: document['productImg'] ?? [],
                                                 description:
                                                     document['description'] ??
-                                                        '');
+                                                        ''
+
+                                            );
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>

@@ -316,50 +316,53 @@ class _AddProductState extends State<AddProduct> {
                     onPressed: () async {
                       FocusScope.of(context).unfocus();
                       if (formkey.currentState!.validate()) {
-                        if (widget.productModel != null) {
-                          List<String> tempListImgUrl = [];
-                          for (int a = 0; a < selectedImage.length; a++) {
-                            String url = await uploadImage(selectedImage[a]);
-                            tempListImgUrl.add(url);
+                        List<String> tempListImgUrl = [];
+                        for (int a = 0; a < selectedImage.length; a++) {
+                          String url = await uploadImage(selectedImage[a]);
+                          tempListImgUrl.add(url);
+                          if (widget.productModel != null) {
+                            updateproduct(
+                              productModel: ProductModel(
+                                productName: productController.text,
+                                description: driscripationController.text,
+                                price: int.parse(priceController.text),
+                                qty: int.parse(qtyController.text),
+                                companyName: companyValue!,
+                                categoryName: categoryValue!,
+                                productImg: tempListImgUrl,
+                              ),
+                            );
                           }
-                          updateproduct(
-                            productModel: ProductModel(
-                              productName: productController.text,
-                              description: driscripationController.text,
-                              price: int.parse(priceController.text),
-                              qty: int.parse(qtyController.text),
-                              companyName: companyValue!,
-                              categoryName: categoryValue!,
-                              productImg: tempListImgUrl,
-                            ),
-                          );
-                        } else {
-                          List<String> tempListImgUrl = [];
-                          for (int a = 0; a < selectedImage.length; a++) {
-                            String url = await uploadImage(selectedImage[a]);
-                            tempListImgUrl.add(url);
-                          }
-                          addproduct(
-                            productModel: ProductModel(
-                              productName: productController.text,
-                              description: driscripationController.text,
-                              price: int.parse(priceController.text),
-                              qty: int.parse(qtyController.text),
-                              companyName: companyValue!,
-                              categoryName: categoryValue!,
-                            /*  category: companyValue!,*/
 
-                              productImg: tempListImgUrl,
-                            ),
-                          );
+                          else {
+                        /*    List<String> tempListImgUrl = [];
+                            for (int a = 0; a < selectedImage.length; a++) {
+                              String url = await uploadImage(selectedImage[a]);
+                              tempListImgUrl.add(url);
+                            }*/
+                            addproduct(
+                              productModel: ProductModel(
+                                productName: productController.text,
+                                description: driscripationController.text,
+                                price: int.parse(priceController.text),
+                                qty: int.parse(qtyController.text),
+                                companyName: companyValue!,
+                                categoryName: categoryValue!,
+                                /*  category: companyValue!,*/
+                                productImg: tempListImgUrl,
+                              ),
+                            );
+                          }
                         }
+                        clearText();
                       }
-                      clearText();
                     },
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(330, 50),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
+                            borderRadius: BorderRadius.circular(10)
+                        )
+                    ),
                     child: const Text("SAVE")),
               ],
             ),
@@ -378,6 +381,7 @@ class _AddProductState extends State<AddProduct> {
   }
 
   Future<String> uploadImage(String file) async {
+
     String name = DateTime.now().toString();
     final ref = FirebaseStorage.instance.ref('images/$name.jpg');
     final task = await ref.putFile(File(file));
@@ -396,9 +400,7 @@ class _AddProductState extends State<AddProduct> {
     body.addAll({productModel.productImg.});*/
 
     return product
-        .add(
-          productModel.tojson(),
-         )
+        .add(productModel.tojson(),)
         .then((value) => logger.d("product add sucessfully"))
         .catchError((error) => logger.e("FIREBASE FAILED"));
   }

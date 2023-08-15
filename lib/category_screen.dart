@@ -99,7 +99,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
                                       InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+
+                                          },
                                           child: const Icon(Icons.edit,
                                               color: Colors.white)),
                                       Padding(
