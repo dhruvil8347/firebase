@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'main.dart';
+import 'model/product_model.dart';
 
 class CompanyScreen extends StatefulWidget {
   const CompanyScreen({Key? key}) : super(key: key);
@@ -10,16 +11,20 @@ class CompanyScreen extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<CompanyScreen> {
-  final  CollectionReference  company =
+  final CollectionReference company =
       FirebaseFirestore.instance.collection('company');
+
+  final CollectionReference product =
+      FirebaseFirestore.instance.collection('product');
 
   TextEditingController companyCtrl = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  List<ProductModel> productList = [];
   String id = "";
   String time = "";
-  int? companyValue ;
+  int? companyValue;
+
   /*DateTime createAt = DateTime.now();*/
-  
 
   @override
   Widget build(BuildContext context) {
@@ -51,17 +56,17 @@ class _MyHomePageState extends State<CompanyScreen> {
               height: 5,
             ),
             ElevatedButton(
-                onLongPress: (){
+                onLongPress: () {
                   logger.i('null');
                 },
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   if (formkey.currentState!.validate()) {
-                    if(id.isNotEmpty){
+                    if (id.isNotEmpty) {
                       updatecompany(id);
-                    }else{
+                    } else {
                       addcompany();
-                    }//ffgdd
+                    } //ffgdd
                     clearText();
                   }
                 },
@@ -75,12 +80,13 @@ class _MyHomePageState extends State<CompanyScreen> {
             Expanded(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
-                    .collection('company').orderBy('createAt', descending: true)
+                    .collection('company')
+                    .orderBy('createAt', descending: true)
                     .snapshots(),
-
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasData) {
                     return ListView(
+
                         ///docs[index].id
                         children: snapshot.data!.docs.map((document) {
                       return ListTile(
@@ -98,7 +104,8 @@ class _MyHomePageState extends State<CompanyScreen> {
                                 SizedBox(
                                   width: 202,
                                   child: Text(
-                                    document['company'],overflow: TextOverflow.ellipsis,
+                                    document['company'],
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                 ),
@@ -107,8 +114,10 @@ class _MyHomePageState extends State<CompanyScreen> {
                                     GestureDetector(
                                         onTap: () {
                                           id = document.id;
+
                                           /// store value in text controller
-                                          companyCtrl.text = document['company'];
+                                          companyCtrl.text =
+                                              document['company'];
                                         },
                                         child: const Icon(Icons.edit,
                                             color: Colors.white)),
@@ -138,9 +147,25 @@ class _MyHomePageState extends State<CompanyScreen> {
                                                                   Colors.blue),
                                                         )),
                                                     TextButton(
-                                                        onPressed: () {
-                                                          deletecompany(
-                                                              document.id);
+                                                        onPressed: () async {
+                                                          CollectionReference<
+                                                                  Map<String,
+                                                                      dynamic>>
+                                                              productionCollection =
+                                                              FirebaseFirestore
+                                                                  .instance
+                                                                  .collection(
+                                                                      'product');
+                   var res = await productionCollection.where("companyName", isEqualTo: document.id).get();
+                   logger.i("data-->${document.id}");
+                   for (var element in res.docs) {
+                     deletecompany(document.id);
+                     logger.i("data-->${element['companyName']}");
+
+                                                          }
+
+                                                          /* deletecompany(
+                                                              document.id);*/
                                                           Navigator.of(context)
                                                               .pop();
                                                         },
@@ -148,9 +173,8 @@ class _MyHomePageState extends State<CompanyScreen> {
                                                           "Delete",
                                                           style: TextStyle(
                                                               color:
-                                                              Colors.red),
-                                                        )
-                                                    )
+                                                                  Colors.red),
+                                                        ))
                                                   ],
                                                 );
                                               },
@@ -179,11 +203,20 @@ class _MyHomePageState extends State<CompanyScreen> {
   Future<void> addcompany() {
     return company.add({
       "company": companyCtrl.text.trim(),
-      "createAt":DateTime.now(),
+      "createAt": DateTime.now(),
     });
   }
 
-  Future<void> deletecompany(String id) {
+  /*  Future<void> deleteproduct(String id) {
+    return product
+        .doc(id)
+        .delete()
+        .then((value) => logger.i("Deleted user"))
+        .catchError((error) => logger.i("Failed $error"));
+  }*/
+
+  Future<void> deletecompany(String id) async {
+    logger.d(id);
     return company
         .doc(id)
         .delete()
@@ -198,7 +231,6 @@ class _MyHomePageState extends State<CompanyScreen> {
         .then((value) => logger.i("upadated user"))
         .catchError((error) => logger.i("failed $error"));
   }
-
 
   clearText() {
     companyCtrl.clear();

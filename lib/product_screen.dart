@@ -6,17 +6,53 @@ import 'main.dart';
 import 'model/product_model.dart';
 
 class ProductScreen extends StatefulWidget {
-  const ProductScreen({Key? key}) : super(key: key);
+  const ProductScreen({
+    Key? key,
+    required this.productListModel,
+  }) : super(key: key);
+
+  final ProductModel productListModel;
 
   @override
   State<ProductScreen> createState() => _ProductScreenState();
 }
 
 class _ProductScreenState extends State<ProductScreen> {
+
   CollectionReference product =
       FirebaseFirestore.instance.collection("product");
+
+
+  final CollectionReference company =
+  FirebaseFirestore.instance.collection("company");
+
+  CollectionReference category =
+      FirebaseFirestore.instance.collection("category");
+
+  String cpyName = '';
+  String categoryName = "";
+
   String id = "";
-  List<ProductModel> productlist = [];
+//  List<ProductModel> productlist = [];
+  @override
+  void initState() {
+    getcompany();
+    super.initState();
+  }
+
+  getcompany()async{
+    List a = await company.get().then((value) => value.docs.where((element) => element.id == widget.productListModel.companyName).toList()) ;
+    List b = await category.get().then((value) => value.docs.where((element) => element.id == widget.productListModel.categoryName).toList()) ;
+    cpyName = a[0]['company'];
+    categoryName = b[1]['category'];
+    logger.t(categoryName);
+    logger.f(cpyName);
+
+    setState(() {
+
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +72,6 @@ class _ProductScreenState extends State<ProductScreen> {
       ),
       body: Column(
         children: [
-
-
           Expanded(
             child: StreamBuilder(
               stream:
@@ -46,6 +80,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 if (snapshot.hasData) {
                   return ListView(
                     children: snapshot.data!.docs.map((document) {
+                     /* logger.d(document['productName']);*/
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
@@ -55,7 +90,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                 MaterialPageRoute(
                                   builder: (context) => DetailScreen(
                                       productListModel: ProductModel(
-                                        id: document.id,
+                                    id: document.id,
                                     productName: document['productName'] ?? "",
                                     price: document['price'] ?? 0,
                                     qty: document['qty'] ?? 0,
@@ -110,13 +145,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                           Text(document['productName'] ?? "",
                                               style: const TextStyle(
                                                   fontSize: 18)),
+                                         Text(categoryName),
                                           Text(
-                                              (document['price'] ?? 0)
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 11)),
-                                          Text(
-                                              (document['qty'] ?? 0).toString(),
+                                              ('Qty: 0${document['qty'] ?? 0}').toString(),
                                               style: const TextStyle(
                                                   fontSize: 12)),
                                         ],
@@ -131,12 +162,6 @@ class _ProductScreenState extends State<ProductScreen> {
                                       ),
                                       ElevatedButton(
                                           onPressed: () {
-                                            // print(document['productName']);
-                                            // print(document['categoryName'] );
-                                            // print(document['companyName'] );
-                                            // print(document['qty']);
-                                            // print(document['price']);
-                                            // print(document['description']);
                                             var model = ProductModel(
                                                 id: document.id,
                                                 productName:
@@ -150,12 +175,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                                         '',
                                                 qty: document['qty'] ?? 0,
                                                 price: document['price'] ?? 0,
-                                                productImg: document['productImg'] ?? [],
+                                                productImg:
+                                                    document['productImg'] ??
+                                                        [],
                                                 description:
                                                     document['description'] ??
-                                                        ''
-
-                                            );
+                                                        '');
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
@@ -234,6 +259,14 @@ class _ProductScreenState extends State<ProductScreen> {
         .then((value) => logger.i("Delete successfully"))
         .catchError((error) => logger.i("Filed $error"));
   }
+
+/*  Future<void> deleteCompany(String id) {
+    return company
+        .doc(id)
+        .delete()
+        .then((value) => logger.i("Delete successfully"))
+        .catchError((error) => logger.i("Filed $error"));
+  }*/
 }
 
 /// all good commit

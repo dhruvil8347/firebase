@@ -1,5 +1,6 @@
 import 'package:firebase_project/category_screen.dart';
 import 'package:firebase_project/comapny_screen.dart';
+import 'package:firebase_project/model/product_model.dart';
 import 'package:firebase_project/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -53,7 +54,7 @@ class _ListappState extends State<MyHomePage> {
             children: [
               GestureDetector(
                 onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) =>  ProductScreen() ,));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) =>  ProductScreen(productListModel: ProductModel()) ,));
                 },
                 child: Container(
                   height: 200,

@@ -318,10 +318,16 @@ class _AddProductState extends State<AddProduct> {
                       if (formkey.currentState!.validate()) {
                         List<String> tempListImgUrl = [];
                         for (int a = 0; a < selectedImage.length; a++) {
-                          String url = await uploadImage(selectedImage[a]);
-                          tempListImgUrl.add(url);
+                          if (!selectedImage[a].contains('https:')) {
+                            String url = await uploadImage(selectedImage[a]);
+                            tempListImgUrl.add(url);
+                          } else {
+                            tempListImgUrl.add(selectedImage[a]);
+                          }
+                        }
+
                           if (widget.productModel != null) {
-                            updateproduct(
+                           await updateproduct(
                               productModel: ProductModel(
                                 productName: productController.text,
                                 description: driscripationController.text,
@@ -335,11 +341,6 @@ class _AddProductState extends State<AddProduct> {
                           }
 
                           else {
-                        /*    List<String> tempListImgUrl = [];
-                            for (int a = 0; a < selectedImage.length; a++) {
-                              String url = await uploadImage(selectedImage[a]);
-                              tempListImgUrl.add(url);
-                            }*/
                             addproduct(
                               productModel: ProductModel(
                                 productName: productController.text,
@@ -348,12 +349,10 @@ class _AddProductState extends State<AddProduct> {
                                 qty: int.parse(qtyController.text),
                                 companyName: companyValue!,
                                 categoryName: categoryValue!,
-                                /*  category: companyValue!,*/
                                 productImg: tempListImgUrl,
                               ),
                             );
                           }
-                        }
                         clearText();
                       }
                     },
@@ -376,7 +375,7 @@ class _AddProductState extends State<AddProduct> {
     return product
         .doc(widget.productModel!.id)
         .update(productModel.tojson())
-        .then((value) => logger.e("product add sucessfully"))
+        .then((value) => logger.e("product update sucessfully"))
         .catchError((error) => logger.e("Filed"));
   }
 

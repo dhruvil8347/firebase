@@ -18,10 +18,13 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   final CollectionReference product =
       FirebaseFirestore.instance.collection("product");
+
   List<ProductModel> productlist = [];
+
   final CollectionReference company =
   FirebaseFirestore.instance.collection("company");
   String cpyName  = "";
+
   final CollectionReference category =
   FirebaseFirestore.instance.collection("category");
   String categoryName =  "";
@@ -200,6 +203,8 @@ class _DetailScreenState extends State<DetailScreen> {
         .then((value) => logger.i("Delete successfully"))
         .catchError((error) => logger.i("Filed $error"));
   }
+
+
 
 
 }
